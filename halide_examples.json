@@ -1,0 +1,389 @@
+[
+  {
+    "prompt": "Brighten an image by 2x",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\n# Constructing Halide functions statically.\ninput = hl.ImageParam(hl.Float(32), 3)\nf = hl.Func('f')\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\n# Double the values and clamp them by 1.\nf[x, y, c] = hl.min(2 * input[x, y, c], 1.0)\n\n# Actually compiling/executing the Halide functions.\n# Setup the input by loading an image (Halide assumes Fortran ordering).\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\n# Ensure shape is (height, width, channels) and memory is contiguous\nimg_np = np.ascontiguousarray(img_np)\n\nimg = hl.Buffer(img_np)\ninput.set(img)\n# Process the input by calling f.realize\noutput = f.realize([img.width(), img.height(), img.channels()])\n# Save the image to a file by converting to a numpy array.\noutput = np.array(output)\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [
+          2,
+          2,
+          3
+        ],
+        "input": [
+          [
+            [
+              0.25,
+              0.25,
+              0.25
+            ],
+            [
+              0.5,
+              0.5,
+              0.5
+            ]
+          ],
+          [
+            [
+              0.75,
+              0.75,
+              0.75
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ]
+          ]
+        ],
+        "expected_output": [
+          [
+            [
+              0.5,
+              0.5,
+              0.5
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ]
+          ],
+          [
+            [
+              1.0,
+              1.0,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ]
+          ]
+        ],
+        "notes": "Brighten a 2x2 image by 2x and clamp to 1.0"
+      },
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [
+          3,
+          3,
+          3
+        ],
+        "input": [
+          [
+            [
+              0.0,
+              0.25,
+              0.5
+            ],
+            [
+              0.75,
+              1.0,
+              0.25
+            ],
+            [
+              0.5,
+              0.75,
+              1.0
+            ]
+          ],
+          [
+            [
+              0.1,
+              0.3,
+              0.5
+            ],
+            [
+              0.7,
+              0.9,
+              1.0
+            ],
+            [
+              0.2,
+              0.4,
+              0.6
+            ]
+          ],
+          [
+            [
+              0.3,
+              0.6,
+              0.9
+            ],
+            [
+              0.2,
+              0.5,
+              0.8
+            ],
+            [
+              0.1,
+              0.4,
+              0.7
+            ]
+          ]
+        ],
+        "expected_output": [
+          [
+            [
+              0.0,
+              0.5,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              0.5
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ]
+          ],
+          [
+            [
+              0.2,
+              0.6,
+              1.0
+            ],
+            [
+              1.0,
+              1.0,
+              1.0
+            ],
+            [
+              0.4,
+              0.8,
+              1.0
+            ]
+          ],
+          [
+            [
+              0.6,
+              1.0,
+              1.0
+            ],
+            [
+              0.4,
+              1.0,
+              1.0
+            ],
+            [
+              0.2,
+              0.8,
+              1.0
+            ]
+          ]
+        ],
+        "notes": "3x3 test of 2x brightening with clamping"
+      }
+    ]
+  },
+  {
+    "prompt": "Apply a 3x3 box blur",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\ninput = hl.ImageParam(hl.Float(32), 3)\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\n\nclamped = hl.Func('clamped')\nclamped[x, y, c] = input[hl.clamp(x, 0, input.width() - 1), hl.clamp(y, 0, input.height() - 1), c]\n\nblur_x = hl.Func('blur_x')\nblur_x[x, y, c] = (clamped[x - 1, y, c] + clamped[x, y, c] + clamped[x + 1, y, c]) / 3.0\n\nblur_y = hl.Func('blur_y')\nblur_y[x, y, c] = (blur_x[x, y - 1, c] + blur_x[x, y, c] + blur_x[x, y + 1, c]) / 3.0\n\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\nimg_np = np.transpose(img_np, (2, 0, 1)).copy()\nimg = hl.Buffer(img_np)\ninput.set(img)\n\noutput = blur_y.realize([img.width(), img.height(), img.channels()])\noutput = np.array(output)\noutput = np.transpose(output, (1, 2, 0))\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [5, 5, 3],
+        "input": [
+          [[1.0, 0.0, 0.5], [0.8, 0.2, 0.6], [0.6, 0.4, 0.7], [0.4, 0.6, 0.8], [0.2, 0.8, 0.9]],
+          [[0.9, 0.1, 0.5], [0.7, 0.3, 0.6], [0.5, 0.5, 0.7], [0.3, 0.7, 0.8], [0.1, 0.9, 0.9]],
+          [[0.8, 0.2, 0.4], [0.6, 0.4, 0.5], [0.4, 0.6, 0.6], [0.2, 0.8, 0.7], [0.0, 1.0, 0.8]],
+          [[0.7, 0.3, 0.3], [0.5, 0.5, 0.4], [0.3, 0.7, 0.5], [0.1, 0.9, 0.6], [0.0, 1.0, 0.7]],
+          [[0.6, 0.4, 0.2], [0.4, 0.6, 0.3], [0.2, 0.8, 0.4], [0.0, 1.0, 0.5], [0.0, 1.0, 0.6]]
+        ],
+        "expected_output": [
+          [[0.898, 0.098, 0.529], [0.765, 0.231, 0.596], [0.565, 0.431, 0.698], [0.365, 0.631, 0.796], [0.231, 0.765, 0.863]],
+          [[0.831, 0.165, 0.498], [0.698, 0.298, 0.565], [0.498, 0.498, 0.663], [0.298, 0.698, 0.765], [0.165, 0.831, 0.831]],
+          [[0.729, 0.263, 0.431], [0.596, 0.396, 0.498], [0.396, 0.596, 0.596], [0.208, 0.784, 0.698], [0.086, 0.910, 0.765]],
+          [[0.631, 0.365, 0.329], [0.498, 0.498, 0.396], [0.298, 0.698, 0.498], [0.129, 0.863, 0.596], [0.031, 0.965, 0.663]],
+          [[0.565, 0.431, 0.263], [0.431, 0.565, 0.329], [0.231, 0.765, 0.431], [0.086, 0.910, 0.529], [0.008, 0.988, 0.596]]
+        ],
+        "notes": "5×5 RGB image processed with a 3×3 box blur (edge clamped, verified with uniform_filter)"
+      }
+    ]
+  },
+  {
+    "prompt": "Crop an image to 10x10 region",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\n# Define input image\ninput = hl.ImageParam(hl.Float(32), 3)\nf = hl.Func('f')\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\n\n# Crop: output only the top-left 10x10 region\nf[x, y, c] = input[x, y, c]\n\n# Load input image\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\nimg_np = np.transpose(img_np, (2, 0, 1)).copy()\nimg = hl.Buffer(img_np)\ninput.set(img)\n\n# Realize a 10x10 crop (CHW order)\noutput = f.realize([img.channels(), 10, 10])\noutput = np.array(output)\noutput = np.transpose(output, (1, 2, 0))  # Back to HWC\n\n# Save cropped image\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [4, 4, 3],
+        "input": [
+          [
+            [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], [1.0, 0.9, 0.8]],
+            [[0.2, 0.3, 0.4], [0.5, 0.6, 0.7], [0.8, 0.9, 1.0], [0.9, 0.8, 0.7]],
+            [[0.3, 0.4, 0.5], [0.6, 0.7, 0.8], [0.9, 1.0, 0.9], [0.8, 0.7, 0.6]],
+            [[0.4, 0.5, 0.6], [0.7, 0.8, 0.9], [1.0, 0.9, 0.8], [0.7, 0.6, 0.5]]
+          ]
+        ],
+        "expected_output": [
+          [
+            [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]],
+            [[0.2, 0.3, 0.4], [0.5, 0.6, 0.7]]
+          ]
+        ],
+        "notes": "Crop top-left 2x2 region from 4x4 RGB image"
+      }
+    ]
+  },
+  {
+    "prompt": "Invert image colors",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\n# Load and normalize input image\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\n\n# Transpose to CHW for Halide\nimg_for_halide = np.transpose(img_np, (2, 0, 1)).copy()\ninput_buf = hl.Buffer(img_for_halide)\ninput = hl.ImageParam(hl.Float(32), 3)\ninput.set(input_buf)\n\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\nf = hl.Func('inverted')\nf[x, y, c] = 1.0 - input[x, y, c]\n\n# Realize output\noutput = f.realize([input_buf.width(), input_buf.height(), input_buf.channels()])\noutput_np = np.array(output)\noutput_np = np.transpose(output_np, (1, 2, 0))\nimageio.imwrite('output.png', (output_np * 255).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 3, 3],
+        "input": [
+          [[0.0, 0.5, 1.0], [0.25, 0.75, 0.5], [1.0, 0.25, 0.0]],
+          [[0.5, 0.5, 0.5], [0.1, 0.9, 0.3], [0.8, 0.2, 0.6]],
+          [[0.2, 0.7, 0.3], [0.4, 0.6, 0.8], [0.9, 0.1, 0.5]]
+        ],
+        "expected_output": [
+          [[1.0, 0.5, 0.0], [0.75, 0.25, 0.5], [0.0, 0.75, 1.0]],
+          [[0.5, 0.5, 0.5], [0.9, 0.1, 0.7], [0.2, 0.8, 0.4]],
+          [[0.8, 0.3, 0.7], [0.6, 0.4, 0.2], [0.1, 0.9, 0.5]]
+        ],
+        "notes": "Invert each pixel by 1 - value for all RGB channels."
+      }
+    ]
+  },
+  {
+    "prompt": "Convert image to grayscale",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\n# Load and normalize input image\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\n\n# Transpose to CHW for Halide\nimg_for_halide = np.transpose(img_np, (2, 0, 1)).copy()\ninput_buf = hl.Buffer(img_for_halide)\ninput = hl.ImageParam(hl.Float(32), 3)\ninput.set(input_buf)\n\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\ngray = hl.Func('gray')\ngray[x, y] = 0.299 * input[x, y, 0] + 0.587 * input[x, y, 1] + 0.114 * input[x, y, 2]\n\noutput = gray.realize([input_buf.width(), input_buf.height()])\noutput_np = np.array(output)\nimageio.imwrite('output.png', (output_np * 255).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 3, 3],
+        "input": [
+          [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+          [[0.5, 0.5, 0.0], [0.0, 0.5, 0.5], [0.5, 0.0, 0.5]],
+          [[1.0, 1.0, 1.0], [0.25, 0.25, 0.25], [0.75, 0.5, 0.25]]
+        ],
+        "expected_output": [
+          [0.2990, 0.5870, 0.1140],
+          [0.4430, 0.3505, 0.2065],
+          [1.0000, 0.2500, 0.4415]
+        ],
+        "notes": "Basic RGB → grayscale test using luminance weights."
+      },
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [4, 4, 3],
+        "input": [
+          [[0.0, 0.0, 0.0], [0.0, 0.333, 0.0], [0.0, 0.667, 0.0], [0.0, 1.0, 0.0]],
+          [[0.333, 0.0, 0.0], [0.333, 0.333, 0.0], [0.333, 0.667, 0.0], [0.333, 1.0, 0.0]],
+          [[0.667, 0.0, 0.0], [0.667, 0.333, 0.0], [0.667, 0.667, 0.0], [0.667, 1.0, 0.0]],
+          [[1.0, 0.0, 0.0], [1.0, 0.333, 0.0], [1.0, 0.667, 0.0], [1.0, 1.0, 0.0]]
+        ],
+        "expected_output": [
+          [0.0000, 0.1956, 0.3912, 0.5870],
+          [0.0996, 0.2952, 0.4908, 0.6866],
+          [0.1993, 0.3949, 0.5905, 0.7863],
+          [0.2990, 0.4946, 0.6902, 0.8859]
+        ],
+        "notes": "Gradient test: R and G vary linearly, B=0."
+      },
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 3, 3],
+        "input": [
+          [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+          [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+          [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+        ],
+        "expected_output": [
+          [0.5870, 0.2990, 0.5870],
+          [0.2990, 0.5870, 0.2990],
+          [0.5870, 0.2990, 0.5870]
+        ],
+        "notes": "Checkerboard pattern alternating between red and green. Grayscale is calculated by formula 0.299 R + 0.587 G + 0.114 B, you msut calculate in the same way"
+      }
+    ]
+  },
+  {
+    "prompt": "Swap red and blue channels",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\ninput = hl.ImageParam(hl.Float(32), 3)\nf = hl.Func('swapped')\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\nf[x, y, c] = hl.select(c == 0, input[x, y, 2],\n                       c == 1, input[x, y, 1],\n                               input[x, y, 0])\n\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\nimg_np = np.transpose(img_np, (2, 0, 1)).copy()\nimg = hl.Buffer(img_np)\ninput.set(img)\n\noutput = f.realize([img.width(), img.height(), img.channels()])\noutput = np.array(output)\noutput = np.transpose(output, (1, 2, 0))\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [2, 2, 3],
+        "input": [
+          [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+          [[0.0, 0.0, 1.0], [0.5, 0.5, 0.0]]
+        ],
+        "expected_output": [
+          [[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]],
+          [[1.0, 0.0, 0.0], [0.0, 0.5, 0.5]]
+        ],
+        "notes": "Swaps red and blue channels (R↔B) while keeping green unchanged."
+      },
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 3, 3],
+        "input": [
+          [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]],
+          [[0.9, 0.8, 0.7], [0.6, 0.5, 0.4], [0.3, 0.2, 0.1]],
+          [[0.0, 0.5, 1.0], [1.0, 0.5, 0.0], [0.5, 0.5, 0.5]]
+        ],
+        "expected_output": [
+          [[0.3, 0.2, 0.1], [0.6, 0.5, 0.4], [0.9, 0.8, 0.7]],
+          [[0.7, 0.8, 0.9], [0.4, 0.5, 0.6], [0.1, 0.2, 0.3]],
+          [[1.0, 0.5, 0.0], [0.0, 0.5, 1.0], [0.5, 0.5, 0.5]]
+        ],
+        "notes": "Validates R↔B swapping on a patterned 3×3 RGB image."
+      }
+    ]
+  },
+  {
+    "prompt": "Apply horizontal flip",
+    "description": "Flips the image horizontally using Halide by mirroring pixels along the vertical axis.",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\ninput = hl.ImageParam(hl.Float(32), 3)\nf = hl.Func('flipped')\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\nf[x, y, c] = input[input.width() - x - 1, y, c]\n\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\nimg_np = np.transpose(img_np, (2, 0, 1)).copy()\nimg = hl.Buffer(img_np)\ninput.set(img)\n\noutput = f.realize([img.width(), img.height(), img.channels()])\noutput = np.array(output)\noutput = np.transpose(output, (1, 2, 0))\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [2, 3, 3],
+        "input": [
+          [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+          [[0.5, 0.5, 0.0], [0.0, 0.5, 0.5], [0.5, 0.0, 0.5]]
+        ],
+        "expected_output": [
+          [[0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+          [[0.5, 0.0, 0.5], [0.0, 0.5, 0.5], [0.5, 0.5, 0.0]]
+        ],
+        "notes": "Flips image horizontally — last column becomes first, preserving color channels."
+      },
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 4, 3],
+        "input": [
+          [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], [1.0, 0.9, 0.8]],
+          [[0.2, 0.3, 0.4], [0.5, 0.6, 0.7], [0.8, 0.9, 1.0], [0.1, 0.2, 0.3]],
+          [[0.9, 0.8, 0.7], [0.6, 0.5, 0.4], [0.3, 0.2, 0.1], [0.0, 0.1, 0.2]]
+        ],
+        "expected_output": [
+          [[1.0, 0.9, 0.8], [0.7, 0.8, 0.9], [0.4, 0.5, 0.6], [0.1, 0.2, 0.3]],
+          [[0.1, 0.2, 0.3], [0.8, 0.9, 1.0], [0.5, 0.6, 0.7], [0.2, 0.3, 0.4]],
+          [[0.0, 0.1, 0.2], [0.3, 0.2, 0.1], [0.6, 0.5, 0.4], [0.9, 0.8, 0.7]]
+        ],
+        "notes": "Verifies horizontal flipping on a non-square 3×4 RGB image."
+      }
+    ]
+  }
+]

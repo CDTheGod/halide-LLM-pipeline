@@ -1,0 +1,61 @@
+[
+  {
+    "prompt": "Brighten an image by 2x",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\n# Constructing Halide functions statically.\ninput = hl.ImageParam(hl.Float(32), 3)\nf = hl.Func('f')\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\n# Double the values and clamp them by 1.\nf[x, y, c] = hl.min(2 * input[x, y, c], 1.0)\n\n# Actually compiling/executing the Halide functions.\n# Setup the input by loading an image (Halide assumes Fortran ordering).\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\n# Ensure shape is (height, width, channels) and memory is contiguous\nimg_np = np.ascontiguousarray(img_np)\n\nimg = hl.Buffer(img_np)\ninput.set(img)\n# Process the input by calling f.realize\noutput = f.realize([img.width(), img.height(), img.channels()])\n# Save the image to a file by converting to a numpy array.\noutput = np.array(output)\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [2, 2, 3],
+        "input": [
+          [[0.25, 0.25, 0.25], [0.5, 0.5, 0.5]],
+          [[0.75, 0.75, 0.75], [1.0, 1.0, 1.0]]
+        ],
+        "expected_output": [
+          [[0.5, 0.5, 0.5], [1.0, 1.0, 1.0]],
+          [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
+        ],
+        "notes": "Brighten a 2x2 image by 2x and clamp to 1.0"
+      },
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 3, 3],
+        "input": [
+          [[0.0, 0.25, 0.5], [0.75, 1.0, 0.25], [0.5, 0.75, 1.0]],
+          [[0.1, 0.3, 0.5], [0.7, 0.9, 1.0], [0.2, 0.4, 0.6]],
+          [[0.3, 0.6, 0.9], [0.2, 0.5, 0.8], [0.1, 0.4, 0.7]]
+        ],
+        "expected_output": [
+          [[0.0, 0.5, 1.0], [1.0, 1.0, 0.5], [1.0, 1.0, 1.0]],
+          [[0.2, 0.6, 1.0], [1.0, 1.0, 1.0], [0.4, 0.8, 1.0]],
+          [[0.6, 1.0, 1.0], [0.4, 1.0, 1.0], [0.2, 0.8, 1.0]]
+        ],
+        "notes": "3x3 test of 2x brightening with clamping"
+      }
+    ]
+  },
+
+  {
+    "prompt": "Apply a 3x3 blur to an image",
+    "halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\n# Step 1: Load and normalize the input image\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\n\n# Step 2: Ensure shape is (height, width, channels) and memory is contiguous\nif img_np.ndim == 2:\n    img_np = img_np[:, :, np.newaxis]  # grayscale fallback\nimg_np = np.ascontiguousarray(img_np)\n\n# Step 3: Transpose to match Halide's layout: [width, height, channels]\nimg_for_halide = np.transpose(img_np, (2, 0, 1)).copy()\ninput_buf = hl.Buffer(img_for_halide)\n\n# Step 4: Declare Halide Vars and ImageParam\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\ninput = hl.ImageParam(hl.Float(32), 3)\ninput.set(input_buf)\n\n# Step 5: Clamp edges to avoid out-of-bounds access\nclamped = hl.Func('clamped')\nclamped[x, y, c] = input[\n    hl.clamp(x, 0, input_buf.width() - 1),\n    hl.clamp(y, 0, input_buf.height() - 1),\n    c\n]\n\n# Step 6: Horizontal blur (blur across X)\nblur_x = hl.Func('blur_x')\nblur_x[x, y, c] = (clamped[x - 1, y, c] + clamped[x, y, c] + clamped[x + 1, y, c]) / 3.0\n\n# Step 7: Vertical blur (blur across Y)\nblur_y = hl.Func('blur_y')\nblur_y[x, y, c] = (blur_x[x, y - 1, c] + blur_x[x, y, c] + blur_x[x, y + 1, c]) / 3.0\n\n# Step 8: Realize the output buffer using correct shape\noutput = blur_y.realize([input_buf.width(), input_buf.height(), input_buf.channels()])\n\n# Step 9: Convert Halide Buffer to NumPy array and transpose back to HWC\noutput_np = np.array(output)\noutput_np = np.transpose(output_np, (1, 2, 0))  # [height, width, channels]\n\n# Step 10: Save the blurred image\nimageio.imsave('output.png', (output_np * 255.0).astype(np.uint8))",
+    "test_cases": [
+      {
+        "format": "HWC",
+        "dtype": "float32",
+        "shape": [3, 3, 1],
+        "input": [
+          [[0.0], [0.5], [1.0]],
+          [[0.25], [0.5], [0.75]],
+          [[1.0], [0.5], [0.0]]
+        ],
+        "expected_output": [
+          [[0.25], [0.5], [0.75]],
+          [[0.5], [0.5], [0.5]],
+          [[0.75], [0.5], [0.25]]
+        ],
+        "notes": "Simple 3x3 grayscale blur"
+      }
+    ]
+  }
+]

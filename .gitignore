@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.DS_Store
+*.env
+.venv/
+.env/
+venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+build/
+
+# Large model or data files
+*.pt
+*.pth
+*.onnx
+*.npz
+*.npy
