@@ -1,0 +1,11 @@
+[
+  {
+    "task_id": 1,
+    "description": "Apply a 3x3 box blur to the input image",
+    "rounds_run": 1,
+    "best_round": 1,
+    "best_passed": 1,
+    "best_total": 1,
+    "status": "pass"
+  }
+]

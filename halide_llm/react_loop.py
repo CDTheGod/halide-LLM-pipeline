@@ -2,7 +2,7 @@ import os, json, numpy as np
 from utils.code_utils import extract_halide_code
 from utils.json_utils import _safe_json
 
-def react_loop_with_code_feedback(base_prompt, pipeline, validator, max_rounds=3):
+def react_loop_with_code_feedback(base_prompt, pipeline, validator, max_rounds=3, operation_name=None, base_output_dir=None):
     last_error = None
     last_halide_code = None
     last_test_cases = None
@@ -40,7 +40,19 @@ def react_loop_with_code_feedback(base_prompt, pipeline, validator, max_rounds=3
         halide_code = extract_halide_code(result.halide_code)
         test_cases_json = result.test_cases
 
-        validation = validator._validate_multiple_cases(halide_code, test_cases_json)
+        # pass operation_name through to validator so it can write runs to the expected folder
+        validation = validator._validate_multiple_cases(
+            halide_code,
+            test_cases_json,
+            operation_name=operation_name,
+            base_output_dir=base_output_dir
+        )
+
+        # Attach model outputs so callers (run_evaluation) can persist them later
+        if isinstance(validation, dict):
+            validation["_model_halide_code"] = halide_code
+            validation["_model_test_cases"] = test_cases_json
+
         results.append(validation)
         if "report" in validation and validation["report"]:
             latest_report_path = validation["report"]

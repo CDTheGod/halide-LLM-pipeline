@@ -1,0 +1,11 @@
+[
+  {
+    "task_id": 2,
+    "description": "Apply a Gaussian blur with sigma=1.5",
+    "rounds_run": 1,
+    "best_round": 1,
+    "best_passed": 1,
+    "best_total": 1,
+    "status": "pass"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "syntax_ok": true,
+  "results": [
+    {
+      "idx": 0,
+      "correctness_index": 1.0,
+      "max_diff": 0.003921570256352425,
+      "mean_diff": 0.002666666405275464,
+      "expected_mean": 0.5210000276565552,
+      "actual_mean": 0.5239999890327454,
+      "path": "C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_1\\runs\\task_1\\case_1"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\nimport imageio\nimport numpy as np\n\ninput = hl.ImageParam(hl.Float(32), 3)\nx, y, c = hl.Var('x'), hl.Var('y'), hl.Var('c')\n\nclamped = hl.Func('clamped')\nclamped[x, y, c] = input[hl.clamp(x, 0, input.width() - 1), hl.clamp(y, 0, input.height() - 1), c]\n\nblur_x = hl.Func('blur_x')\nblur_x[x, y, c] = (clamped[x - 1, y, c] + clamped[x, y, c] + clamped[x + 1, y, c]) / 3.0\n\nblur_y = hl.Func('blur_y')\nblur_y[x, y, c] = (blur_x[x, y - 1, c] + blur_x[x, y, c] + blur_x[x, y + 1, c]) / 3.0\n\nimg_np = imageio.imread('input.png').astype(np.float32) / 255.0\nimg_np = np.ascontiguousarray(img_np)\nimg_np = np.transpose(img_np, (2, 0, 1)).copy()\nimg = hl.Buffer(img_np)\ninput.set(img)\n\noutput = blur_y.realize([img.width(), img.height(), img.channels()])\noutput = np.array(output)\noutput = np.transpose(output, (1, 2, 0))\nimageio.imsave('output.png', (output * 255.0).astype(np.uint8))",
+  "_model_test_cases": "```json\n[\n    {\n        \"format\": \"HWC\",\n        \"dtype\": \"float32\",\n        \"shape\": [5, 5, 3],\n        \"input\": [\n            [[1.0, 0.0, 0.5], [0.8, 0.2, 0.6], [0.6, 0.4, 0.7], [0.4, 0.6, 0.8], [0.2, 0.8, 0.9]],\n            [[0.9, 0.1, 0.5], [0.7, 0.3, 0.6], [0.5, 0.5, 0.7], [0.3, 0.7, 0.8], [0.1, 0.9, 0.9]],\n            [[0.8, 0.2, 0.4], [0.6, 0.4, 0.5], [0.4, 0.6, 0.6], [0.2, 0.8, 0.7], [0.0, 1.0, 0.8]],\n            [[0.7, 0.3, 0.3], [0.5, 0.5, 0.4], [0.3, 0.7, 0.5], [0.1, 0.9, 0.6], [0.0, 1.0, 0.7]],\n            [[0.6, 0.4, 0.2], [0.4, 0.6, 0.3], [0.2, 0.8, 0.4], [0.0, 1.0, 0.5], [0.0, 1.0, 0.6]]\n        ],\n        \"expected_output\": [\n            [[0.898, 0.098, 0.529], [0.765, 0.231, 0.596], [0.565, 0.431, 0.698], [0.365, 0.631, 0.796], [0.231, 0.765, 0.863]],\n            [[0.831, 0.165, 0.498], [0.698, 0.298, 0.565], [0.498, 0.498, 0.663], [0.298, 0.698, 0.765], [0.165, 0.831, 0.831]],\n            [[0.729, 0.263, 0.431], [0.596, 0.396, 0.498], [0.396, 0.596, 0.596], [0.208, 0.784, 0.698], [0.086, 0.91, 0.765]],\n            [[0.631, 0.365, 0.329], [0.498, 0.498, 0.396], [0.298, 0.698, 0.498], [0.129, 0.863, 0.596], [0.031, 0.965, 0.663]],\n            [[0.565, 0.431, 0.263], [0.431, 0.565, 0.329], [0.231, 0.765, 0.431], [0.086, 0.91, 0.529], [0.008, 0.988, 0.596]]\n        ],\n        \"notes\": \"5\u00c3\u20145 RGB image processed with a 3\u00c3\u20143 box blur (edge clamped, verified with uniform_filter)\"\n    }\n]\n```"
+}

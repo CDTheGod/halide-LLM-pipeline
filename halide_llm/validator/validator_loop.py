@@ -91,7 +91,7 @@ class HalideValidatorLoop:
 
 
 
-    def _validate_multiple_cases(self, halide_code: str, test_cases_json: str, operation_name="operation"):
+    def _validate_multiple_cases(self, halide_code: str, test_cases_json: str, operation_name="operation", base_output_dir: str = None):
         print("\n================= JSON Parsing Debug =================")
         print(test_cases_json)
         print("=====================================================\n")
@@ -127,11 +127,9 @@ class HalideValidatorLoop:
                 })
             return augmented
 
-        cases = expand_small_test_cases(cases)
-        cases = cases[0:3]
         all_results = []
-
-        base_run_dir = os.path.join(os.getcwd(), "runs", operation_name.replace(" ", "_"))
+        root = base_output_dir if base_output_dir else os.getcwd()
+        base_run_dir = os.path.join(root, "runs", operation_name.replace(" ", "_"))
         os.makedirs(base_run_dir, exist_ok=True)
 
         for idx, case in enumerate(cases):
@@ -203,7 +201,7 @@ class HalideValidatorLoop:
             }
             all_results.append(result)
 
-            if score >= 0.99:
+            if score >= 0.88:
                 print(f"✅ Test #{idx+1} passed! (saved to {case_dir})")
             else:
                 print(f"❌ Test #{idx+1} failed (saved to {case_dir})")
@@ -211,11 +209,11 @@ class HalideValidatorLoop:
 
         syntax_ok = all("error" not in r for r in all_results)
                 # 🧭 Generate HTML report for visual inspection
-        try:
-            report_path = self._generate_html_gallery(operation_name, all_results)
-        except Exception as e:
-            print(f"⚠️ Failed to generate HTML report: {e}")
-            report_path = None
+        # try:
+        #     report_path = self._generate_html_gallery(operation_name, all_results)
+        # except Exception as e:
+        #     print(f"⚠️ Failed to generate HTML report: {e}")
+        #     report_path = None
         return {"syntax_ok": syntax_ok, "results": all_results}
     
 

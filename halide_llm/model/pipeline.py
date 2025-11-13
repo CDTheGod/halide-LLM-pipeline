@@ -1,6 +1,9 @@
 import dspy
 import json
 from dspy.teleprompt import BootstrapFewShot
+from model.config import get_model
+
+get_model()
 
 class HalideCodeGen(dspy.Signature):
     """Signature: Generate Halide code + test cases."""
@@ -77,3 +80,6 @@ def get_pipeline():
 
     tele = BootstrapFewShot(metric=None)
     return tele.compile(HalidePipeline(), trainset=reference_examples)
+
+# bootstrap pipeline at import time for convenience
+refined_pipeline = get_pipeline()
