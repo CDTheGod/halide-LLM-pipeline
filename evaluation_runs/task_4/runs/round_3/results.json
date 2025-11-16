@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Expecting ',' delimiter: line 3 column 23 (char 30)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input buffer\nbuf = hl.Buffer(hl.UInt(8), [16, 256, 256])\n\n# Flatten the buffer into a 1D array\nflattened_buf = buf.flatten()\n\n# Compute the sum of all elements in the flattened buffer\nsum_result = flattened_buf.sum()\n\n# Define the output buffer\noutput_buf = hl.Buffer(hl.UInt(32), [1])\n\n# Compute the final result by storing the sum in the output buffer\nhl.Store(output_buf, sum_result)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": [[[0 for _ in range(256)] for _ in range(256)] for _ in range(16)],\n        \"expected_output\": 0\n    },\n    {\n        \"input\": [[[1 for _ in range(256)] for _ in range(256)] for _ in range(16)],\n        \"expected_output\": 65536\n    }\n]\n```"
+}

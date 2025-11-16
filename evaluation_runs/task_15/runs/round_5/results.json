@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\ninput_image = hl.Buffer(hl.UInt(8), [256, 256, 3])\n\n# Define a function that performs the convolution operation\ndef convolve(input):\n    # Create a new buffer to store the output\n    output = hl.Buffer(hl.UInt(8), [256, 256, 3])\n    \n    # Perform the convolution operation using the Convolution operator\n    kernel = hl.Const([0.1, 0.2, 0.1], hl.Float32)\n    convolve = hl.Convolution(input, kernel, hl.BorderMode.halide_constant(0))\n    \n    # Store the output in the new buffer\n    output = convolve\n    \n    return output\n\n# Define the Halide pipeline\npipeline = hl.Pipeline()\ninput_buffer = pipeline.input(hl.UInt(8), \"input\", [256, 256, 3])\noutput_buffer = convolve(input_buffer)\npipeline.return_(output_buffer)\n\n# Compile and run the pipeline\nhl.compile_pipeline(pipeline)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create a sample input image\ninput_image = np.random.randint(0, 256, size=(256, 256, 3), dtype=np.uint8)\n\n# Run the Halide pipeline on the input image\noutput_image = hl.run_pipeline(pipeline, {\"input\": input_image})\n\n# Save the output image to a file\nimageio.imwrite(\"output.png\", output_image)\n```"
+}

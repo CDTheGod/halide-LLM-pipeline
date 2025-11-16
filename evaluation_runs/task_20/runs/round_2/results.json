@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Expecting value: line 14 column 29 (char 311)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\nimport numpy as np\n\n# Define the input array\ninput_array = np.array([\n    [[0.1, 0.2], [0.3, 0.4]],\n    [[0.5, 0.6], [0.7, 0.8]],\n    [[0.9, 1.0], [1.1, 1.2]]\n])\n\n# Define the Halide function\ndef load_and_process(input_array):\n    # Create a Halide image from the input array\n    img = hl.Image(hl.Rand(10, 20), hl.BGR(32))\n    \n    # Load the input data into the image\n    img.load(input_array)\n    \n    # Perform some operation on the image (e.g. add 1 to each pixel value)\n    result = img + 1\n    \n    return result\n\n# Run the Halide function\nresult = load_and_process(input_array)\n\n# Convert the result back to a numpy array for comparison with expected output\nresult_array = np.array(result).astype(np.float32)",
+  "_model_test_cases": "```json\n[\n  {\n    \"test_idx\": 0,\n    \"input_sample\": [\n      [[0.1, 0.2], [0.3, 0.4]],\n      [[0.5, 0.6], [0.7, 0.8]],\n      [[0.9, 1.0], [1.1, 1.2]]\n    ],\n    \"expected_output_sample\": [\n      [[1.1, 1.2], [1.3, 1.4]],\n      [[1.5, 1.6], [1.7, 1.8]],\n      [[1.9, 2.0], [2.1, 2.2]]\n    ],\n    \"actual_output_sample\": result_array.tolist()\n  }\n]\n```"
+}

@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output functions\ninput_func = hl.Func('input')\noutput_func = hl.Func('output')\n\n# Define the operations to be applied (e.g. filtering or thresholding)\ndef apply_operations(input):\n    # Apply a simple filter (e.g. median filter)\n    filtered_input = hlMedianFilter(input, 3)\n    \n    # Apply a threshold\n    thresholded_input = hlThreshold(filtered_input, 128)\n    \n    return thresholded_input\n\n# Define the Halide code for the input and output functions\ninput_func[hhl.Range(0, n), hhl.Range(0, m)] = input\noutput_func[hhl.Range(0, n), hhl.Range(0, m)] = apply_operations(input_func)\n\n# Compile the Halide code to a C++ file\nhl.compile_to_cpp(output_func, 'output')",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create sample inputs and expected outputs\ninput_data = np.random.rand(10, 10, 3).astype(np.uint8)\nexpected_output = np.random.rand(10, 10, 3).astype(np.uint8)\n\n# Save the input data to a file\nimageio.imwrite('input.png', input_data)\n\n# Run the Halide code and save the output to a file\noutput_data = apply_operations(input_data)\nimageio.imwrite('output.png', output_data)\n\n# Compare the output with the expected output using a testing framework like Pytest\nimport pytest\n\ndef test_output():\n    actual_output = imageio.imread('output.png')\n    assert np.allclose(actual_output, expected_output)\n```"
+}

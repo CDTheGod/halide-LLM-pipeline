@@ -1,0 +1,20 @@
+[
+  {
+    "task_id": 1,
+    "description": "Apply a 3x3 box blur to the input image",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 2,
+    "description": "Apply a Gaussian blur with sigma=1.5",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  }
+]

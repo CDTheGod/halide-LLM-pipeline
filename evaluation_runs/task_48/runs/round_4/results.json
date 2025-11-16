@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Expecting value: line 5 column 13 (char 69)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\nimg = hl.ImageParam(hl.scalar.float32(), hl.make_vector(0, 100), 'img')\n\n# Blur the image using filter_box\nblurred_img = hl.filter_box(img, 3)\n\n# Compile and run the code\nhl.compile_to_file('blur_image', blurred_img)",
+  "_model_test_cases": "```json\n[\n    {\n        \"test_idx\": 0,\n        \"input_sample\": [\n            np.array([\n                [1, 2, 3],\n                [4, 5, 6],\n                [7, 8, 9]\n            ])\n        ],\n        \"expected_output_sample\": [\n            np.array([\n                [10, 10, 10],\n                [10, 10, 10],\n                [10, 10, 10]\n            ])\n        ]\n    },\n    {\n        \"test_idx\": 1,\n        \"input_sample\": [\n            np.array([\n                [9, 8, 7],\n                [6, 5, 4],\n                [3, 2, 1]\n            ])\n        ],\n        \"expected_output_sample\": [\n            np.array([\n                [10, 10, 10],\n                [10, 10, 10],\n                [10, 10, 10]\n            ])\n        ]\n    }\n]\n```"
+}

@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[1, 2], [3, 4]]'"
+    },
+    {
+      "idx": 1,
+      "error": "Array load failed: could not convert string to float: '[[10, 20], [30, 40]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input buffer\nbuf = hl.Buffer(hl.UInt(8), (1000, 1000))\n\n# Flatten the 3D array into a 1D array\ndef flatten(buf):\n    return buf.flatten()\n\n# Compute the average pixel value across all images\ndef avg_pixel_value(flattened_buf):\n    sum = flattened_buf.sum()\n    count = flattened_buf.count()\n    return sum / count\n\n# Generate Halide code for the computation\ncode = hl.make_module()\ncode.input(buf)\nflattened_buf = flatten(code.input())\navg_val = avg_pixel_value(flattened_buf)\n\n# Define the output buffer\noutput = hl.Buffer(hl.UInt(8), (1))\n\n# Compute and store the average pixel value in the output buffer\ncode.output(output)\ncode.return_(avg_val).cast_to(hl.UInt(32)).store_in(output)\n\n# Compile and run the Halide code\nmodule = code.compile()\ninput_data = np.random.randint(0, 256, size=(1000, 1000))\noutput_data = module.run(input_data)\n\nprint(output_data)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": \"[[1, 2], [3, 4]]\",\n        \"expected_output\": 2.5\n    },\n    {\n        \"input\": \"[[10, 20], [30, 40]]\",\n        \"expected_output\": 25.0\n    }\n]\n```"
+}

@@ -1,0 +1,9 @@
+{
+  "task_id": 50,
+  "description": "Replace dark pixels (<0.2) with pure black and bright pixels (>0.8) with pure white",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 0,
+  "status": "fail"
+}

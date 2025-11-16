@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output buffers\ninput_buffer = hl.Buffer(hl.float32, (6, 5, 3))\noutput_buffer = hl.Buffer(hl.float32, (6, 5, 3))\n\n# Define the computation for each pixel in the output buffer\ndef process_pixel(x, y):\n    # Get the input values for this pixel\n    r = input_buffer[x, y, 0]\n    g = input_buffer[x, y, 1]\n    b = input_buffer[x, y, 2]\n\n    # Compute the output value for this pixel\n    output_value = (r + g + b) / 3\n\n    return output_value\n\n# Define the pipeline\npipeline = hl.Pipeline()\npipeline.add_input(input_buffer)\npipeline.add_output(output_buffer)\n\n# Schedule the computation\npipeline.schedule(hl.Range(0, 6), hl.Range(0, 5))\n\n# Compile and run the pipeline\nhl.compile_pipeline(pipeline)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create a sample input image\ninput_image = np.random.rand(6, 5, 3)\n\n# Run the pipeline on the input image\noutput_image = hl.run_pipeline(pipeline, input_buffer=input_image)\n\n# Compare the output with the expected result\nexpected_output = (np.sum(input_image, axis=2) / 3).astype(np.float32)\nnp.testing.assert_array_equal(output_image, expected_output)\n```"
+}

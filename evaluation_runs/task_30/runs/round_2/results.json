@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output images\ninput_image = hl.ImageParam(hl.float32, 3)\noutput_image = hl.Image(output_image.ctype(), output_image.dim(0).cast_to_int(),\n                        output_image.dim(1).cast_to_int())\n\n# Apply blur operation using convolve function\nblur_kernel = hl.Func(\"blur_kernel\")\nblur_kernel[hx, hy] = (hl.sin(hx) + hl.cos(hy)) / 16.0\n\noutput_image = hl.Convolve(blur_kernel)(input_image)\n\n# Define the pipeline\npipe = hl.Pipeline(output_image)",
+  "_model_test_cases": "```python\nimport numpy as np\nimport imageio\n\n# Create a sample input image\ninput_array = np.random.rand(256, 256, 3).astype(np.float32)\ninput_image = hl.Image(input_array)\n\n# Run the pipeline\noutput_array = pipe.realize(input_image).asnumpy()\n\n# Save the output image to file\nimageio.imwrite('output.png', output_array)\n```"
+}

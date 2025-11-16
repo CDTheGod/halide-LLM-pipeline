@@ -1,0 +1,9 @@
+{
+  "task_id": 8,
+  "description": "Brighten the image by a factor of 1.5",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 0,
+  "status": "fail"
+}

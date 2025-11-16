@@ -1,0 +1,9 @@
+{
+  "task_id": 29,
+  "description": "Compute image histogram bins (normalized)",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 0,
+  "status": "fail"
+}

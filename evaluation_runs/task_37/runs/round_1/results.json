@@ -1,0 +1,6 @@
+{
+  "syntax_ok": true,
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output buffers\ninput_buffer = hl.Buffer(hl.float32, [3, 256, 256])\noutput_buffer = hl.Buffer(hl.float32, [3, 256, 256])\n\n# Create a buffer from the given data\nbuffer = hl.Buffer(hl.float32, [3, 256, 256], input_data)\n\n# Define a custom function to apply a filter on the buffer\ndef apply_filter(x, y):\n    return (input_buffer(x, y, 0) + input_buffer(x, y, 1) + input_buffer(x, y, 2)) / 3.0\n\n# Apply the filter on the buffer\nhl.For('x', 0, 256).store(output_buffer, apply_filter, 'y')\n\n# Define a Halide function to perform the operation\ndef halide_function():\n    hl.For('x', 0, 256).For('y', 0, 256).store(output_buffer, apply_filter, 'x')",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create a sample input data\ninput_data = np.random.rand(3, 256, 256)\n\n# Convert the input data to Halide buffer\nbuffer = hl.Buffer(hl.float32, [3, 256, 256], input_data)\n\n# Apply the filter on the buffer using the custom function\noutput_buffer = hl.For('x', 0, 256).For('y', 0, 256).store(buffer, apply_filter, 'x')\n\n# Convert the output buffer to a numpy array\noutput_array = np.array(output_buffer)\n\n# Test case: Check if the output is correct\nassert np.allclose(output_array, (input_data + input_data + input_data) / 3.0)\n```"
+}

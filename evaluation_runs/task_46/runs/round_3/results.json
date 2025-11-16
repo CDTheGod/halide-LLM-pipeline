@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[1.0, 2.0], [3.0, 4.0]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input function\ninput_func = hl.Func('input')\ninput_func[hhl.Range(0, 10), hhl.Range(0, 10), hhl.Range(0, 10)] = hl.Var('x') + hl.Var('y') + hl.Var('z')\n\n# Define the output function\noutput_func = hl.Func('output')\noutput_func[hhl.Range(0, 10), hhl.Range(0, 10), hhl.Range(0, 10)] = input_func * input_func\n\n# Compute the output\noutput_func.compute_root()\n\n# Print the Halide code\nprint(hl.codegen(output_func))",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": \"[[1.0, 2.0], [3.0, 4.0]]\",\n        \"expected_output\": \"[[1.0, 4.0], [9.0, 16.0]]\"\n    }\n]\n```"
+}

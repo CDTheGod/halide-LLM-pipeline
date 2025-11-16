@@ -8,7 +8,7 @@ def get_model():
         api_key="ollama",
         model_type="chat",
         temperature=0.2,
-        max_tokens=10000
+        max_tokens=100000000
     )
     dspy.configure(lm=lm)
     return lm

@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_13\\runs\\task_13\\case_1\\halide_code.py\", line 25, in <module>\r\n    processed_image = process_image(image_data)\r\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_13\\runs\\task_13\\case_1\\halide_code.py\", line 5, in process_image\r\n    pipe = hl.Pipeline('image')\r\n           ^^^^^^^^^^^^^^^^^^^^\r\nTypeError: __init__(): incompatible constructor arguments. The following argument types are supported:\r\n    1. halide.halide_.Pipeline()\r\n    2. halide.halide_.Pipeline(arg0: halide.halide_.Func)\r\n    3. halide.halide_.Pipeline(arg0: List[halide.halide_.Func])\r\n\r\nInvoked with: 'image'\r\n"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\ndef process_image(image):\n    # Define the Halide pipeline\n    pipe = hl.Pipeline('image')\n    \n    # Define the input and output variables\n    in_image = pipe.input(hl.UInt(8), 'in', image.shape)\n    out_image = pipe.output(hl.UInt(8), 'out', image.shape)\n    \n    # Apply a blur operation to the image\n    blurred_image = hl.Convolve(in_image, 3, 3)\n    \n    # Assign the blurred image to the output variable\n    out_image = blurred_image\n    \n    # Compile and run the pipeline\n    pipe.compile_jit()\n    processed_image = pipe.run(in_image.asnumpy())\n    \n    return processed_image\n\n# Example usage:\nimage_data = [[[0.5, 0.7], [0.2, 0.1]], [[0.9, 0.8], [0.6, 0.4]]]\nprocessed_image = process_image(image_data)\nprint(processed_image)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": [[[0.5, 0.7], [0.2, 0.1]], [[0.9, 0.8], [0.6, 0.4]]],\n        \"expected_output\": [[[0.45, 0.55], [0.35, 0.25]], [[0.85, 0.75], [0.65, 0.45]]]\n    }\n]\n```"
+}

@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\nimg = hl.ImageParam(hl.float32, 'xy', (1024, 768))\n\n# Define the gradient operators\nsobel_x = hl.Func('sobel_x')\nsobel_y = hl.Func('sobel_y')\n\n# Compute gradients in x and y directions using Sobel operator\nsobel_x(img) = hl.Min(\n    hl.Max(img(x+1, y-1), img(x, y-1)),\n    hl.Max(img(x+1, y), img(x, y))\n)\n\nsobel_y(img) = hl.Min(\n    hl.Max(img(x-1, y+1), img(x, y+1)),\n    hl.Max(img(x, y+1), img(x, y))\n)\n\n# Compute gradient magnitude\ngrad_mag = hl.Func('grad_mag')\ngrad_mag(img) = hl.Sqrt(sobel_x(img)**2 + sobel_y(img)**2)\n\n# Define the output image\noutput = grad_mag(img)\n\n# Compile and run the function\noutput.compile_jit()",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Generate a sample input image\nimg_data = np.random.rand(1024, 768).astype(np.float32)\ninput_img = hl.Image(hl.float32, 'xy', (1024, 768), img_data)\n\n# Run the function on the input image\noutput_data = output.run(input_img).buffer\n\n# Compare with expected result\nexpected_result = np.sqrt(sobel_x(img_data)**2 + sobel_y(img_data)**2)\nnp.testing.assert_almost_equal(output_data, expected_result)\n```"
+}

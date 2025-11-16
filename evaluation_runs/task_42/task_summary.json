@@ -1,0 +1,9 @@
+{
+  "task_id": 42,
+  "description": "Simulate a heatmap effect by mapping grayscale values to a colormap",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 2,
+  "status": "fail"
+}

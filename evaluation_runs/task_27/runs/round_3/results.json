@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Expecting value: line 4 column 21 (char 45)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\ninput = hl.ImageParam(hl.float32, [3, 256, 256])\n\n# Resize the input image\nresized_input = hl.image_resize(input, 128, 128)\n\n# Blur the resized image\nblurred_image = hl.image_blur(resized_input, 2, 5)\n\n# Threshold the blurred image\nthresholded_image = hl.image_threshold(blurred_image, 0.5)\n\n# Define the output function\ndef output(x, y):\n    return thresholded_image(x, y)\n\n# Compile and run the code\noutput.compile_jit().run()",
+  "_model_test_cases": "```json\n[\n  {\n    \"test_idx\": 0,\n    \"input_sample\": np.array([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], [[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]]),\n    \"expected_output_sample\": np.array([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], [[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]]),\n    \"actual_output_sample\": np.array([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], [[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]])\n  }\n]\n```"
+}

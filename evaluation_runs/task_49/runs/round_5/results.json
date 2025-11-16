@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_49\\runs\\task_49\\case_1\\halide_code.py\", line 13, in <module>\r\n    input_type = hl.BoundedInt(0, 255)\r\n                 ^^^^^^^^^^^^^\r\nAttributeError: module 'halide' has no attribute 'BoundedInt'\r\n"
+    },
+    {
+      "idx": 1,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_49\\runs\\task_49\\case_2\\halide_code.py\", line 13, in <module>\r\n    input_type = hl.BoundedInt(0, 255)\r\n                 ^^^^^^^^^^^^^\r\nAttributeError: module 'halide' has no attribute 'BoundedInt'\r\n"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output variables\ninput_var = hl.Var('x')\ninput_var_2d = hl.Var('y')\ninput_var_3d = hl.Var('z')\n\noutput_var = hl.Var('x')\noutput_var_2d = hl.Var('y')\noutput_var_3d = hl.Var('z')\n\n# Define the input and output types\ninput_type = hl.BoundedInt(0, 255)\noutput_type = hl.BoundedInt(0, 255)\n\n# Create a Halide function\nfunc = hl.Func('my_func')\n\n# Define the body of the function\nfunc[hx, hy, hz] = hl.Select(hl.Or(hx == 0, hx == input_var.x + 1), \n                             hl.Select(hy == 0, output_type(255),\n                                       hl.Select(hy == input_var.y + 1,\n                                                 output_type(0),\n                                                 hl.Min(input_var[hy], input_var[hy+1]))),\n                             hl.Select(hy == 0, output_type(255),\n                                       hl.Select(hy == input_var.y + 1,\n                                                 output_type(0),\n                                                 hl.Max(input_var[hy-1], input_var[hy]))))\n\n# Define the schedule\nfunc.schedule[hx] = hl.Divide(hl.Input(hl.Int32), 2)\nfunc.schedule[hy] = hl.Divide(hl.Input(hl.Int32), 2)\n\n# Compile and run the function\nhl.compile_to_c(func, 'my_func')",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": [[[1, 2], [3, 4]], [[5, 6], [7, 8]]],\n        \"expected_output\": [[[255, 0], [0, 255]], [[255, 0], [0, 255]]]\n    },\n    {\n        \"input\": [[[9, 10], [11, 12]], [[13, 14], [15, 16]]],\n        \"expected_output\": [[[255, 0], [0, 255]], [[255, 0], [0, 255]]]\n    }\n]\n```"
+}

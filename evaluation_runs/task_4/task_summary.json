@@ -1,0 +1,9 @@
+{
+  "task_id": 4,
+  "description": "Detect horizontal edges using the Sobel operator",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 0,
+  "status": "fail"
+}

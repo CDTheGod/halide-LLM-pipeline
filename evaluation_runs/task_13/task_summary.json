@@ -1,0 +1,9 @@
+{
+  "task_id": 13,
+  "description": "Rotate the image by 90 degrees clockwise",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 1,
+  "status": "fail"
+}

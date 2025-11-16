@@ -1,0 +1,9 @@
+{
+  "task_id": 19,
+  "description": "Posterize the image to 4 intensity levels",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 2,
+  "status": "fail"
+}

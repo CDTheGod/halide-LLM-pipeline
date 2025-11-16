@@ -18,7 +18,7 @@ class HalidePipeline(dspy.Module):
     def __init__(self):
         super().__init__()
         self.gen = dspy.ChainOfThought(HalideCodeGen)
-        with open("examples/halide_examples.json", "r") as f:
+        with open("examples/halide_examples_clean.json", "r") as f:
             self.examples = json.load(f)
 
     def forward(self, full_prompt=None, user_input=None, feedback=None, prev_thoughts=None, prompt=None):
@@ -64,22 +64,28 @@ class HalidePipeline(dspy.Module):
         return result
 
 
+# def get_pipeline():
+#     """Bootstrap the Halide pipeline using few-shot examples."""
+#     with open("examples/halide_examples_clean.json") as f:
+#         raw_examples = json.load(f)
+
+#     reference_examples = [
+#         dspy.Example(
+#             prompt=ex["prompt"],
+#             halide_code=ex["halide_code"],
+#             test_cases=json.dumps(ex["test_cases"])
+#         ).with_inputs("prompt")
+#         for ex in raw_examples
+#     ]
+
+#     tele = BootstrapFewShot(metric=None)
+#     return tele.compile(HalidePipeline(), trainset=reference_examples)
+
+# # bootstrap pipeline at import time for convenience
+# refined_pipeline = get_pipeline()
+
 def get_pipeline():
-    """Bootstrap the Halide pipeline using few-shot examples."""
-    with open("examples/halide_examples.json") as f:
-        raw_examples = json.load(f)
+    """Return raw Halide pipeline WITHOUT bootstrapping."""
+    return HalidePipeline()
 
-    reference_examples = [
-        dspy.Example(
-            prompt=ex["prompt"],
-            halide_code=ex["halide_code"],
-            test_cases=json.dumps(ex["test_cases"])
-        ).with_inputs("prompt")
-        for ex in raw_examples
-    ]
-
-    tele = BootstrapFewShot(metric=None)
-    return tele.compile(HalidePipeline(), trainset=reference_examples)
-
-# bootstrap pipeline at import time for convenience
-refined_pipeline = get_pipeline()
+refined_pipeline=HalidePipeline()

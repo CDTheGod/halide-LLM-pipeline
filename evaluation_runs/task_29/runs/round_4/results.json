@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input type\ninput_type = hl.BlasFloat(3)\n\n# Define the output type\noutput_type = hl.BlasFloat(1)\n\n# Create the function\nfunc = hl.Func('grayscale')\n\n# Define the body of the function\nbody = func.root()\nbody = hl.Cast(hl.RGBToGray(body), output_type)\n\n# Define the input and output variables\ninput_var = hl.Var('input')\noutput_var = hl.Var('output')\n\n# Define the schedule\nschedule = hl.Schedule(func)\nschedule.parallel(input_var, 4)\nschedule.parallel(output_var, 4)\n\n# Create the Halide code\ncode = func.compile_to_c()\n\nprint(code)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Generate a random RGB image\nimage = np.random.rand(256, 256, 3).astype(np.float32)\n\n# Convert the image to grayscale using the Halide function\noutput_image = halide_grayscale(image)\n\n# Save the output image to a file\nimageio.imwrite('output.png', output_image)\n```"
+}

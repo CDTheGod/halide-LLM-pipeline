@@ -1,0 +1,137 @@
+[
+  {
+    "task_id": 36,
+    "description": "Compute an outline of objects by subtracting a blurred version",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 1,
+    "status": "fail"
+  },
+  {
+    "task_id": 37,
+    "description": "Apply bilateral-like edge-preserving blur",
+    "rounds_run": 1,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 38,
+    "description": "Apply a cartoon effect by combining bilateral smoothing with edge detection",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 39,
+    "description": "Generate a synthetic horizontal gradient image from black to white",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 2,
+    "status": "fail"
+  },
+  {
+    "task_id": 40,
+    "description": "Generate a synthetic radial gradient image",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 41,
+    "description": "Enhance saturation by 20% in HSV space",
+    "rounds_run": 1,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 42,
+    "description": "Simulate a heatmap effect by mapping grayscale values to a colormap",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 2,
+    "status": "fail"
+  },
+  {
+    "task_id": 43,
+    "description": "Blend two images using a circular alpha mask",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 44,
+    "description": "Compute image difference and amplify edges for visualization",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 45,
+    "description": "Apply a mosaic effect with random colored tiles",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  },
+  {
+    "task_id": 46,
+    "description": "Apply a wave distortion along the horizontal axis",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 1,
+    "status": "fail"
+  },
+  {
+    "task_id": 47,
+    "description": "Rotate hue of an RGB image by 60 degrees",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 2,
+    "status": "fail"
+  },
+  {
+    "task_id": 48,
+    "description": "Add a circular vignette mask that darkens corners",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 2,
+    "status": "fail"
+  },
+  {
+    "task_id": 49,
+    "description": "Compute edge magnitude map using Sobel filter and normalize",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 2,
+    "status": "fail"
+  },
+  {
+    "task_id": 50,
+    "description": "Replace dark pixels (<0.2) with pure black and bright pixels (>0.8) with pure white",
+    "rounds_run": 5,
+    "best_round": 1,
+    "best_passed": 0,
+    "best_total": 0,
+    "status": "fail"
+  }
+]

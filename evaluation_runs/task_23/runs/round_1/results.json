@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the pipeline for the input image\ndef create_pipeline():\n    x = hl.Var('x')\n    y = hl.Var('y')\n    c = hl.Var('c')\n\n    input_image = hl.Func('input_image')\n    output_image = hl.Func('output_image')\n\n    input_image[x, y] = hl.Cast(hl.UInt(8), 0)\n    for i in range(-1, 2):\n        for j in range(-1, 2):\n            input_image[x + i, y + j] += hl.Load(input_image, x + i, y + j)\n\n    output_image[x, y] = hl.Cast(hl.UInt(8), 0)\n    for i in range(-1, 2):\n        for j in range(-1, 2):\n            output_image[x + i, y + j] += input_image[x + i, y + j]\n\n    return output_image\n\n# Create the pipeline\npipeline = create_pipeline()\n\n# Compile and run the pipeline\nhl.compile_pipeline(pipeline)",
+  "_model_test_cases": "```python\nimport numpy as np\nimport imageio\n\n# Generate a random 3D array representing an input image\ninput_image = np.random.randint(0, 256, size=(100, 100, 3), dtype=np.uint8)\n\n# Run the pipeline on the input image\noutput_image = pipeline.run(input_image).asnumpy()\n\n# Save the output image to a file\nimageio.imwrite('output.png', output_image)\n```"
+}

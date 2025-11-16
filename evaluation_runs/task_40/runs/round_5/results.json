@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\ndef process_image(image):\n    # Define the pipeline stages\n    input_stage = hl.Input('input', image.shape)\n    resize_stage = hl.ResizeBilinear(input_stage, 256, 256)\n    convert_stage = hl.Convert(resize_stage, 'grayscale')\n    output_stage = hl.Output(convert_stage)\n\n    # Create the pipeline\n    pipeline = hl.Pipeline(output_stage)\n\n    return pipeline\n\n# Generate Halide code for the pipeline\npipeline = process_image(np.random.rand(512, 512, 3))\nhalide_code = pipeline.generate_halide_code()\n\nprint(halide_code)",
+  "_model_test_cases": "```python\nimport imageio\nimport numpy as np\n\ndef generate_test_case(image):\n    # Process the image with the process_image function\n    processed_image = process_image(image)\n\n    return processed_image\n\n# Create sample images for testing\nimage1 = np.random.rand(512, 512, 3)\nimage2 = np.random.rand(256, 256, 3)\n\n# Generate test cases\ntest_case1 = generate_test_case(image1)\ntest_case2 = generate_test_case(image2)\n\nprint(test_case1)\nprint(test_case2)\n```"
+}

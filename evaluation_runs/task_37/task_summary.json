@@ -1,0 +1,9 @@
+{
+  "task_id": 37,
+  "description": "Apply bilateral-like edge-preserving blur",
+  "rounds_run": 1,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 0,
+  "status": "fail"
+}

@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[1, 2, 3], [4, 5, 6], [7, 8, 9]]'"
+    },
+    {
+      "idx": 1,
+      "error": "Array load failed: could not convert string to float: '[[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\nimg = hl.Buffer(hl.UInt(8), [1024, 768, 3])\n\n# Apply a simple filter (e.g., blur)\ndef blur(img):\n    x = img.dim(0).cast(int)\n    y = img.dim(1).cast(int)\n    c = img.dim(2).cast(int)\n\n    # Define the kernel\n    kernel = hl.Func('kernel')\n    kernel[x, y] = 1/9 * (img[x-1, y-1, c] + img[x, y-1, c] + img[x+1, y-1, c] +\n                         img[x-1, y, c] + img[x, y, c] + img[x+1, y, c] +\n                         img[x-1, y+1, c] + img[x, y+1, c] + img[x+1, y+1, c])\n\n    # Apply the kernel to each pixel\n    return hl.Func('blur')(x, y) = kernel(x, y)\n\n# Define the output image\noutput_img = blur(img)\n\n# Compile and run the code\nhl.compile_to_c(output_img)",
+  "_model_test_cases": "```json\n[\n  {\n    \"input\": \"[[1, 2, 3], [4, 5, 6], [7, 8, 9]]\",\n    \"expected_output\": \"[[4, 4, 4], [4, 4, 4], [4, 4, 4]]\"\n  },\n  {\n    \"input\": \"[[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]]]\",\n    \"expected_output\": \"[[[4, 4, 4], [4, 4, 4], [4, 4, 4]], [[4, 4, 4], [4, 4, 4], [4, 4, 4]]]\"\n  }\n]\n```"
+}

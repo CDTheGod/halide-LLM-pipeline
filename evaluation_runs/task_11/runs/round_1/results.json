@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the dimensions and data type of the input image\ninput_image = hl.Func('input_image')\ninput_image.type.set(hl.TypeFloat(0))\n\n# Specify the bounds of the image\nx_range = hl.Range(0, 256)\ny_range = hl.Range(0, 256)\nz_range = hl.Range(0, 3)\n\n# Define the input and output images\ninput_img = hl.ImageParam(input_image.type, 'input')\noutput_img = hl.ImageParam(input_image.type, 'output')\n\n# Create a Halide pipeline that converts the input image to grayscale\npipeline = hl.pipeline()\npipeline.add(hl.Cast(output_img, input_img))\n\n# Generate Halide code for the pipeline\nhl_code = pipeline.generate()\n\nprint(hl_code)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create a 3D numpy array representing the input image\ninput_array = np.random.rand(256, 256, 3)\n\n# Convert the numpy array to a Halide image\nhalide_image = hl.ImageParam(hl.TypeFloat(0), 'input')\nhalide_image.set(input_array)\n\n# Run the Halide pipeline on the input image\noutput_array = halide_image.asnumpy()\n\n# Save the output image as a PNG file\nimageio.imwrite('output.png', output_array)\n```"
+}

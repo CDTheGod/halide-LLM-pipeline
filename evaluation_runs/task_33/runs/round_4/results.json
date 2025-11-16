@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Expecting value: line 3 column 18 (char 25)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output types\ninput_type = hl.Func('input')\noutput_type = hl.Func('output')\n\n# Define the Halide function\ndef halide_function(input_data):\n    # Create a new Halide variable to hold the output data\n    output = hl.Var('x', 0, input_data.shape[0])\n    \n    # Perform some operation on the input data (in this case, just copy it)\n    for x in range(input_data.shape[0]):\n        for y in range(input_data.shape[1]):\n            for z in range(input_data.shape[2]):\n                output[x, y, z] = input_data[x, y, z]\n    \n    return output\n\n# Compile the Halide function\nhalide_code = halide_function(hl.Func('input'))",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Define some test cases\ntest_cases = [\n    {\n        'input': np.array([[[1, 2, 3], [4, 5, 6], [7, 8, 9]]]),\n        'expected_output': np.array([[[1, 2, 3], [4, 5, 6], [7, 8, 9]]])\n    },\n    {\n        'input': np.array([[[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]]]]),\n        'expected_output': np.array([[[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[10, 11, 12], [13, 14, 15], [16, 17, 18]]]])\n    }\n]\n```"
+}

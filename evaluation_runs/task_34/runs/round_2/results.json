@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: 'input'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input type\ninput_type = hl.Buf.R32f(hl.Dim(3))\n\n# Create a Halide pipeline that reads and writes the input image\ndef create_pipeline():\n    # Define the input variable\n    x = hl.Var('x')\n    y = hl.Var('y')\n    z = hl.Var('z')\n\n    # Read the input image\n    img = hl.Buf.R32f(hl.Dim(3))(x, y, z)\n\n    # Create a pipeline that reads and writes the input image\n    pipe = hl.Pipeline(img)\n    return pipe\n\n# Compile and run the pipeline\npipe = create_pipeline()\npipe.compile_jit()\n\n# Run the pipeline with some sample data (not provided in the prompt)\ninput_data = np.array([...])  # Replace with actual input data\noutput_data = pipe.run(input_data)\n\nprint(output_data)",
+  "_model_test_cases": "```json\n[\n    {\n        \"test_idx\": 0,\n        \"input_sample\": [...],  # Replace with actual input data\n        \"expected_output_sample\": [...],  # Replace with actual expected output\n        \"actual_output_sample\": [...]  # Replace with actual output from running the pipeline\n    }\n]\n```"
+}

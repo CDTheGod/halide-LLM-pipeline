@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_34\\runs\\task_34\\case_1\\halide_code.py\", line 4, in <module>\r\n    input_type = hl.Buf.R32f(hl.Dim(3))\r\n                 ^^^^^^\r\nAttributeError: module 'halide' has no attribute 'Buf'\r\n"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output types\ninput_type = hl.Buf.R32f(hl.Dim(3))\noutput_type = hl.Buf.R32f(hl.Dim(3))\n\n# Create a buffer from the input array\ninput_buffer = hl.Buffer(input_type, [10, 10, 3])\n\n# Apply a simple blur operation (e.g., using a 3x3 kernel)\nkernel = hl.Func('kernel')\nkernel[hhl.Range(1, 8)] = hl.Max(hl.Min(\n    input_buffer[hhl.Range(-1, 0), hhl.Range(-1, 0)],\n    input_buffer[hhl.Range(1, 2), hhl.Range(1, 2)]\n))\n\n# Create the output buffer\noutput_buffer = hl.Buffer(output_type, [10, 10, 3])\n\n# Compute the output using the kernel function\nkernel.compute_root(hl.Output(output_buffer))",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": [\n            [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]],\n            [[10.0, 11.0, 12.0], [13.0, 14.0, 15.0], [16.0, 17.0, 18.0]],\n            [[19.0, 20.0, 21.0], [22.0, 23.0, 24.0], [25.0, 26.0, 27.0]]\n        ],\n        \"expected_output\": [\n            [[4.5, 6.0, 7.5], [8.0, 9.5, 11.0], [10.5, 12.0, 13.5]],\n            [[14.0, 15.5, 17.0], [18.0, 19.5, 21.0], [20.5, 22.0, 23.5]],\n            [[26.0, 27.5, 29.0], [30.0, 31.5, 33.0], [34.5, 36.0, 37.5]]\n        ]\n    }\n]\n```"
+}

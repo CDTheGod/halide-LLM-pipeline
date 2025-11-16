@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image type\ninput_image = hl.ImageParam(hl.float32, [2, 4])\n\n# Create a new image with twice the resolution in each dimension\nnew_image = hl.Image(hl.float32, [4, 8], \"new_image\")\n\n# Perform interpolation using the interpolate function from the image_processing module\ninterpolated_pixel = hl.image_processing.interpolate(input_image, new_image)\n\n# Define the output function\ndef interpolated_image(x, y):\n    return interpolated_pixel[x, y]\n\n# Compile and run the Halide code\nhl.compile_to_function(interpolated_image)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create a sample input image\ninput_image = np.random.rand(2, 4)\n\n# Create a sample expected output image\nexpected_output = np.random.rand(4, 8)\n\n# Run the Halide code and get the actual output\nactual_output = interpolated_image(0, 0)\n\n# Calculate metrics such as maximum difference and mean difference\nmax_diff = np.max(np.abs(actual_output - expected_output))\nmean_diff = np.mean(np.abs(actual_output - expected_output))\n\n# Print the test case results\nprint(\"Test Case Results:\")\nprint(\"Maximum Difference:\", max_diff)\nprint(\"Mean Difference:\", mean_diff)\n\n# Save the actual output to a file for comparison with the expected output\nnp.save(\"actual_output.npy\", actual_output)\n```"
+}

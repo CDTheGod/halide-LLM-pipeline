@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Extra data: line 1 column 4 (char 3)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\ninput_image = hl.Var('input_image')\n\n# Compute the gradient in x direction\ngrad_x = hl.Func('grad_x')\ngrad_x[hil.BoundaryConditions.periodic(0)] = hl.grad(input_image, 0)\n\n# Compute the gradient in y direction\ngrad_y = hl.Func('grad_y')\ngrad_y[hil.BoundaryConditions.periodic(1)] = hl.grad(input_image, 1)\n\n# Compute the gradient magnitude\ngradient_magnitude = hl.sqrt(grad_x * grad_x + grad_y * grad_y)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Generate a random input image\ninput_image_data = np.random.rand(256, 256, 3).astype(np.float32)\n\n# Compute the gradient magnitude using Halide\nhalide_gradient_magnitude = hl.compile_to_function('gradient_magnitude')(input_image_data)\n\n# Compute the gradient magnitude using NumPy for comparison\nnumpy_gradient_magnitude = np.sqrt(np.square(np.gradient(input_image_data)[0]) + np.square(np.gradient(input_image_data)[1]))\n\n# Check if the results are close enough\nassert np.allclose(halide_gradient_magnitude, numpy_gradient_magnitude)\n```"
+}

@@ -58,9 +58,9 @@ The script must be standalone — no functions, markdown, or comments.
 Use only Halide primitives (hl.Func, hl.Var, hl.ImageParam, hl.clamp, hl.min, etc.).
 
 🧪 Phase 3 — Test Case Generation
-Generate exactly 6 JSON test cases:
+Generate exactly 7 JSON test cases:
 
-1 small analytical test (3×3 or 5×5) with manually computed expected values.
+2 small analytical tests (3×3 or 5×5) with manually computed expected values.
 
 5 larger 32×32 RGB tests, each with explicitly computed expected_output.
 

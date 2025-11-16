@@ -1,0 +1,9 @@
+{
+  "task_id": 32,
+  "description": "Apply a checkerboard masking effect alternating every 8 pixels",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 2,
+  "status": "fail"
+}

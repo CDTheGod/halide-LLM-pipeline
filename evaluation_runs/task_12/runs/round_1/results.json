@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[0.2, 0.3], [0.4, 0.5]]'"
+    },
+    {
+      "idx": 1,
+      "error": "Array load failed: could not convert string to float: '[[0.6, 0.7], [0.8, 0.9]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\ndef threshold_image(image):\n    # Define the input image\n    x = hl.Var('x')\n    y = hl.Var('y')\n    c = hl.Var('c')\n\n    # Define the output image\n    out = hl.Func('out')\n    out[x, y] = hl.If(image[x, y, 0] > 0.5, 1, 0)\n\n    return out\n\n# Create a sample input image\nimage = np.random.rand(10, 10, 3).astype(np.float32)\nimage[::2, ::2, 0] = 1.0  # Set some pixels to 1\n\n# Run the thresholding function\nthresholded_image = threshold_image(image)\n\n# Convert the output image back to a numpy array\nresult = np.array(thresholded_image).astype(np.uint8)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": \"[[0.2, 0.3], [0.4, 0.5]]\",\n        \"expected_output\": \"[[1, 1], [1, 1]]\"\n    },\n    {\n        \"input\": \"[[0.6, 0.7], [0.8, 0.9]]\",\n        \"expected_output\": \"[[1, 1], [1, 1]]\"\n    }\n]\n```"
+}

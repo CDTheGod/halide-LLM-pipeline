@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_10\\runs\\task_10\\case_1\\halide_code.py\", line 24, in <module>\r\n    nearest_points = find_nearest_point(points)\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_10\\runs\\task_10\\case_1\\halide_code.py\", line 11, in find_nearest_point\r\n    distance = euclidean_distance(0, 0, 0, point[0], point[1], point[2])\r\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_10\\runs\\task_10\\case_1\\halide_code.py\", line 5, in euclidean_distance\r\n    return (x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2\r\n            ~~~^~~~\r\nTypeError: unsupported operand type(s) for -: 'list' and 'int'\r\n"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define a function to calculate the Euclidean distance between two points\ndef euclidean_distance(x1, y1, z1, x2, y2, z2):\n    return (x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2\n\n# Define a function to find the nearest point to the origin from each set of points\ndef find_nearest_point(points):\n    min_distances = []\n    for point in points:\n        distance = euclidean_distance(0, 0, 0, point[0], point[1], point[2])\n        min_distances.append(distance)\n    return min_distances\n\n# Define the input points\npoints = [[[0.5, 0.3, 0.2],\n           [0.7, 0.4, 0.6],\n           [0.9, 0.1, 0.8]],\n          [[0.2, 0.5, 0.3],\n           [0.6, 0.7, 0.9],\n           [0.1, 0.8, 0.4]]]\n\n# Find the nearest point to the origin from each set of points\nnearest_points = find_nearest_point(points)\n\n# Print the result\nprint(nearest_points)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": [[[0.5, 0.3, 0.2],\n                   [0.7, 0.4, 0.6],\n                   [0.9, 0.1, 0.8]],\n                  [[0.2, 0.5, 0.3],\n                   [0.6, 0.7, 0.9],\n                   [0.1, 0.8, 0.4]]],\n        \"expected_output\": [[0.25, 0.44], [0.09, 0.49]]\n    }\n]\n```"
+}

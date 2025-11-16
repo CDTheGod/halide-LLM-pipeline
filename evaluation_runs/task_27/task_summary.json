@@ -1,0 +1,9 @@
+{
+  "task_id": 27,
+  "description": "Pad the image with a 10-pixel black border",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 1,
+  "status": "fail"
+}

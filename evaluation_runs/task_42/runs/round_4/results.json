@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_42\\runs\\task_42\\case_1\\halide_code.py\", line 8, in <module>\r\n    img = hl.Image(hl.RandGenState(), input_type, image_shape)\r\n          ^^^^^^^^\r\nAttributeError: module 'halide' has no attribute 'Image'. Did you mean: 'Stage'?\r\n"
+    },
+    {
+      "idx": 1,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_42\\runs\\task_42\\case_2\\halide_code.py\", line 8, in <module>\r\n    img = hl.Image(hl.RandGenState(), input_type, image_shape)\r\n          ^^^^^^^^\r\nAttributeError: module 'halide' has no attribute 'Image'. Did you mean: 'Stage'?\r\n"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image type and shape\ninput_type = hl.Float(32)\nimage_shape = (32, 32)\n\n# Create a Halide image variable\nimg = hl.Image(hl.RandGenState(), input_type, image_shape)\n\n# Perform some operation on the image (for example, blur it)\nblurred_img = img.blur(3, 3)\n\n# Define the output type and shape\noutput_type = hl.Float(32)\noutput_shape = (32, 32)\n\n# Create a Halide output variable\nout = hl.Image(hl.RandGenState(), output_type, output_shape)\n\n# Copy the blurred image to the output\nhl.copy(out, blurred_img)\n\n# Compile the Halide code\nhl.compile_to_c(blurred_img)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": [[1.0, 2.0], [3.0, 4.0]],\n        \"expected_output\": [[2.5, 3.5], [3.5, 4.5]]\n    },\n    {\n        \"input\": [[5.0, 6.0], [7.0, 8.0]],\n        \"expected_output\": [[6.25, 7.25], [7.25, 8.25]]\n    }\n]\n```"
+}

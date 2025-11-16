@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input type\ninput_type = hl.UInt(8)\n\n# Create a variable for the input image\nx, y, c = input_type.new_3d_variable(\"x\", \"y\", \"c\")\n\ndef resize_image(input_img):\n    # Define the output type\n    output_type = hl.UInt(8)\n\n    # Create a variable for the output image\n    out_x, out_y, out_c = output_type.new_3d_variable(\"out_x\", \"out_y\", \"out_c\")\n\n    # Apply some operations (e.g., resizing)\n    func = hl.Func(\"resize_image\")\n    func[x, y, c] = input_img[x, y, c]\n    func[out_x, out_y, out_c] = hl.Round(func[x, y, c])\n\n    return func\n\n# Create a Halide pipeline\npipeline = resize_image(x, y, c)\n\n# Compile and run the pipeline\nhl.compile_pipeline(pipeline)\nhalide_output = hl.run_pipeline(pipeline)",
+  "_model_test_cases": "```python\nimport numpy as np\nimport imageio\n\n# Create a sample input image\ninput_img = np.random.randint(0, 256, size=(100, 100, 3), dtype=np.uint8)\n\n# Run the pipeline with the sample input image\nhalide_output = resize_image(input_img)\n\n# Save the output to a file\nimageio.imwrite(\"output.png\", halide_output)\n```"
+}

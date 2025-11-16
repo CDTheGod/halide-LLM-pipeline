@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Expecting value: line 4 column 21 (char 45)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output variables\ninput_image = hl.ImageParam(hl.float32, [5, 5])\noutput_image = hl.Buffer(hl.float32, [5 * 5])\n\n# Convert the image from RGB to grayscale using Halide's built-in function\ngrayscale_image = hlRgbToGrayscale(input_image)\n\n# Define the computation for each pixel in the output image\nwith hl.Stage():\n    hl.For('x', 0, 5).store(output_image, 'x',\n        hl.Select(grayscale_image, 0, x) + hl.Select(grayscale_image, 1, x) * 0.299 +\n        hl.Select(grayscale_image, 2, x) * 0.587 + hl.Select(grayscale_image, 3, x) * 0.114)\n\n# Define the Halide pipeline\npipeline = hl.make_pipeline(\n    hl.Input(input_image),\n    hl.Output(output_image)\n)\n\n# Compile and run the pipeline\nhl.compile(pipeline).run()",
+  "_model_test_cases": "```json\n[\n  {\n    \"test_idx\": 0,\n    \"input_sample\": np.array([[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], [[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]]),\n    \"expected_output_sample\": np.array([[5.0, 6.0], [9.0, 10.0]])\n  }\n]\n```"
+}

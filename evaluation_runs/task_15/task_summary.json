@@ -1,0 +1,9 @@
+{
+  "task_id": 15,
+  "description": "Add uniform random noise in range [-0.1, 0.1]",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 0,
+  "status": "fail"
+}

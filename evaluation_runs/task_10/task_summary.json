@@ -1,0 +1,9 @@
+{
+  "task_id": 10,
+  "description": "Threshold image to binary using a value of 0.5",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 1,
+  "status": "fail"
+}

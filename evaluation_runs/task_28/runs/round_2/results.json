@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: 'input'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\ndef generate_volume():\n    x = 10\n    y = 10\n    z = 10\n    \n    # Create a buffer for the volume data\n    volume = hl.Buffer(hl.Float(32), [x, y, z])\n    \n    # Initialize the volume with zeros\n    volume.fill(0)\n    \n    # Set the values of the volume based on the input data\n    for i in range(x):\n        for j in range(y):\n            for k in range(z):\n                volume[i, j, k] = 1.0\n    \n    return volume\n\ndef generate_image(volume):\n    x = 10\n    y = 10\n    \n    # Create a buffer for the image data\n    image = hl.Buffer(hl.Float(32), [x, y])\n    \n    # Initialize the image with zeros\n    image.fill(0)\n    \n    # Render the volume into the image\n    for i in range(x):\n        for j in range(y):\n            image[i, j] = 1.0\n    \n    return image\n\ndef main():\n    volume = generate_volume()\n    image = generate_image(volume)\n    \n    # Save the image to a file\n    image.save(\"output.png\")\n\nif __name__ == \"__main__\":\n    main()",
+  "_model_test_cases": "```json\n[\n  {\n    \"test_idx\": 0,\n    \"input_sample\": [\n      [1.0, 2.0, 3.0],\n      [4.0, 5.0, 6.0],\n      [7.0, 8.0, 9.0]\n    ],\n    \"expected_output_sample\": [\n      [10.0, 20.0, 30.0],\n      [40.0, 50.0, 60.0],\n      [70.0, 80.0, 90.0]\n    ]\n  }\n]\n```"
+}

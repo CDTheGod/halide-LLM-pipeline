@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: JSON parsing failed: Extra data: line 4 column 2 (char 82)",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\nimg = hl.ImageParam(hl.float32, 3)\n\n# Define the output function\noutput = hl.Func('output')\n\n# Compute the maximum of each pixel's color channels\noutput[hx, hy] = hl.max(img[x, y, 0], img[x, y, 1], img[x, y, 2])\n\n# Generate Halide code for the computation graph\nhl.codegen(output)\n\n# Compile and run the generated code\ncompiled_output = hl.compile_and_run(output)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Define a sample input image\ninput_image = np.array([\n    [[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]],\n    [[0.7, 0.8, 0.9], [1.0, 1.1, 1.2]]\n])\n\n# Define the expected output image\nexpected_output = np.array([\n    [[0.3, 0.5, 0.6], [1.0, 1.1, 1.2]],\n    [[0.9, 1.1, 1.2], [1.0, 1.1, 1.2]]\n])\n\n# Define the actual output image (computed by running the Halide code)\nactual_output = compiled_output\n\n# Compute the difference between the expected and actual outputs\ndiff = np.abs(expected_output - actual_output)\n\n# Print the maximum and mean differences\nprint(\"Max diff:\", np.max(diff))\nprint(\"Mean diff:\", np.mean(diff))\n\n# Check if the difference is within a certain tolerance (e.g. 1e-6)\ntolerance = 1e-6\nif np.max(diff) < tolerance:\n    print(\"Test passed!\")\nelse:\n    print(\"Test failed!\")\n```"
+}

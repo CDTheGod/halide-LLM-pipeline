@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[1.0, 2.0], [3.0, 4.0]]'"
+    },
+    {
+      "idx": 1,
+      "error": "Array load failed: could not convert string to float: '[[5.0, 6.0], [7.0, 8.0]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input buffer\nbuf = hl.Buffer(hl.float32, [3, 256, 256])\n\n# Split the buffer into separate planes for each color channel\nr = buf.split(0)\ng = r.split(1)\nb = g.split(2)\n\n# Extract the color channel values\nred = b.project(hl.Range(), hl.DimTag.y, hl.DimTag.x)\ngreen = b.project(hl.Range(), hl.DimTag.y, hl.DimTag.x)\nblue = b.project(hl.Range(), hl.DimTag.y, hl.DimTag.x)\n\n# Define the output buffers\nout_red = hl.Buffer(hl.float32, [256, 256])\nout_green = hl.Buffer(hl.float32, [256, 256])\nout_blue = hl.Buffer(hl.float32, [256, 256])\n\n# Compute the color channel values\nhl.Func('compute').add_input(buf).add_output(out_red).add_output(out_green).add_output(out_blue)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": \"[[1.0, 2.0], [3.0, 4.0]]\",\n        \"expected_output\": \"[[1.0, 2.0], [3.0, 4.0]]\"\n    },\n    {\n        \"input\": \"[[5.0, 6.0], [7.0, 8.0]]\",\n        \"expected_output\": \"[[5.0, 6.0], [7.0, 8.0]]\"\n    }\n]\n```"
+}

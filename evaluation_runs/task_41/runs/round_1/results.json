@@ -1,0 +1,6 @@
+{
+  "syntax_ok": true,
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image as a Halide buffer\ninput_image = hl.Buffer(hl.UInt(8), [1024, 1024, 3])\n\n# Apply Gaussian blur filter to each channel\ndef gaussian_blur(input):\n    # Create a kernel for the Gaussian blur filter\n    kernel = hl.Function('kernel', hl.Vector(2), input)\n    kernel = hl.Convolve(kernel, hl.GaussianBlur(5))\n    \n    # Apply the kernel to each channel of the input image\n    output = hl.For('x', 0, input.shape[0], hl.For('y', 0, input.shape[1]))\n        .For('c', 0, input.shape[2])\n        .Output(hl.Select(input[x, y, c], kernel(x, y)))\n    \n    return output\n\n# Define the Halide pipeline\npipeline = gaussian_blur(input_image)\n\n# Compile and run the pipeline\nhl.compile_pipeline(pipeline)",
+  "_model_test_cases": "```python\nimport numpy as np\nimport imageio\n\n# Create a sample input image\ninput_data = np.random.randint(0, 256, size=(1024, 1024, 3), dtype=np.uint8)\n\n# Convert the input data to a Halide buffer\ninput_buffer = hl.Buffer(hl.UInt(8), [1024, 1024, 3], input_data)\n\n# Run the pipeline and get the output image\noutput_image = gaussian_blur(input_buffer).run()\n\n# Save the output image as a PNG file\nimageio.imwrite('output.png', output_image)\n```"
+}

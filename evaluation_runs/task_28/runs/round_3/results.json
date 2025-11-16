@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: 'input'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input array\ninput_array = np.array([...])  # Replace with actual input data\n\n# Create a Halide variable from the input array\ninput_var = hl.Image(input_array, 'float32')\n\n# Perform some basic operation (e.g., resizing)\noutput_var = input_var.resize(hl.Dim(2), hl.Dim(3))\n\n# Generate the output\noutput = output_var.compile_to_function('output').run()",
+  "_model_test_cases": "```json\n[\n  {\n    \"test_idx\": 0,\n    \"input_sample\": [...],  # Replace with actual input data\n    \"expected_output_sample\": [...],  # Replace with expected output data\n    \"actual_output_sample\": [...]  # Replace with actual output data\n  }\n]\n```"
+}

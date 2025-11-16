@@ -1,0 +1,9 @@
+{
+  "task_id": 28,
+  "description": "Mirror-pad the image with a 10-pixel border",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 2,
+  "status": "fail"
+}

@@ -1,0 +1,9 @@
+{
+  "task_id": 48,
+  "description": "Add a circular vignette mask that darkens corners",
+  "rounds_run": 5,
+  "best_round": 1,
+  "best_passed": 0,
+  "best_total": 2,
+  "status": "fail"
+}

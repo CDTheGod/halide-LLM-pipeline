@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\ndef generate_halide_code():\n    # Create input image buffer\n    input_image = hl.Buffer(hl.float32, [1024, 768])\n\n    # Define resized image buffer\n    resized_image = hl.Buffer(hl.float32, [512, 384])\n\n    # Convert image data to float32\n    input_image.copy_from(np.random.rand(1024, 768).astype(np.float32))\n\n    # Apply operations to input image\n    output_image = hl.image(input_image)\n    output_image.resize(resized_image)\n\n    # Define blur function\n    def blur(image):\n        return hl.image(image).blur(hl.Radius(2), hl.Radius(2))\n\n    # Apply blur operation to resized image\n    blurred_image = blur(output_image)\n\n    # Convert blurred image data back to uint8\n    blurred_image.copy_to(np.random.rand(512, 384).astype(np.uint8))\n\n    return input_image, output_image, resized_image, blurred_image\n\ninput_image, output_image, resized_image, blurred_image = generate_halide_code()",
+  "_model_test_cases": "```python\nimport numpy as np\n\ndef generate_test_cases():\n    # Generate random input image data\n    input_image_data = np.random.rand(1024, 768).astype(np.float32)\n\n    # Generate expected output image data\n    expected_output_image_data = np.random.rand(512, 384).astype(np.uint8)\n\n    return input_image_data, expected_output_image_data\n\ninput_image_data, expected_output_image_data = generate_test_cases()\n```"
+}

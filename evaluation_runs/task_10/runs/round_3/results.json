@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_10\\runs\\task_10\\case_1\\halide_code.py\", line 4, in <module>\r\n    input_buffer = hl.Buffer(hl.UInt(8), 256, 256, 3)\r\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nTypeError: __init__(): incompatible constructor arguments. The following argument types are supported:\r\n    1. halide.halide_.Buffer(buffer: buffer, name: str = '', reverse_axes: bool = True)\r\n    2. halide.halide_.Buffer()\r\n    3. halide.halide_.Buffer(arg0: halide.halide_.Buffer)\r\n    4. halide.halide_.Buffer(type: Halide::Type, sizes: List[int], name: str = '')\r\n    5. halide.halide_.Buffer(type: Halide::Type, sizes: List[int], storage_order: List[int], name: str = '')\r\n\r\nInvoked with: <halide.Type uint8>, 256, 256, 3\r\n"
+    },
+    {
+      "idx": 1,
+      "error": "Halide code failed:\nExit code: 1\nOutput:\nTraceback (most recent call last):\r\n  File \"C:\\Users\\Cezan\\python\\dspy\\evaluation_runs\\task_10\\runs\\task_10\\case_2\\halide_code.py\", line 4, in <module>\r\n    input_buffer = hl.Buffer(hl.UInt(8), 256, 256, 3)\r\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\nTypeError: __init__(): incompatible constructor arguments. The following argument types are supported:\r\n    1. halide.halide_.Buffer(buffer: buffer, name: str = '', reverse_axes: bool = True)\r\n    2. halide.halide_.Buffer()\r\n    3. halide.halide_.Buffer(arg0: halide.halide_.Buffer)\r\n    4. halide.halide_.Buffer(type: Halide::Type, sizes: List[int], name: str = '')\r\n    5. halide.halide_.Buffer(type: Halide::Type, sizes: List[int], storage_order: List[int], name: str = '')\r\n\r\nInvoked with: <halide.Type uint8>, 256, 256, 3\r\n"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image buffer\ninput_buffer = hl.Buffer(hl.UInt(8), 256, 256, 3)\n\n# Define the Halide function\ndef halide_function(input_image):\n    # Apply filters to the input image\n    blurred_image = hl.Convolve(input_image, hl.BoxKernel(5))\n    sharpened_image = hl.Convolve(input_image, hl.BoxKernel(1))\n\n    # Combine the filtered images using operators\n    combined_image = hl.Add(blurred_image, sharpened_image)\n\n    return combined_image\n\n# Define the Halide pipeline\npipeline = halide_function(input_buffer)\n\n# Compile and run the pipeline\nhl.compile_pipeline(pipeline)\noutput_image = pipeline.run()",
+  "_model_test_cases": "```json\n[\n  {\n    \"input\": [\n      [1, 2, 3],\n      [4, 5, 6],\n      [7, 8, 9]\n    ],\n    \"expected_output\": [\n      [10, 12, 14],\n      [16, 18, 20],\n      [22, 24, 26]\n    ]\n  },\n  {\n    \"input\": [\n      [10, 20, 30],\n      [40, 50, 60],\n      [70, 80, 90]\n    ],\n    \"expected_output\": [\n      [20, 40, 60],\n      [80, 100, 120],\n      [140, 160, 180]\n    ]\n  }\n]\n```"
+}

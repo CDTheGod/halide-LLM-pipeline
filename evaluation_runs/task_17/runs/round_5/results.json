@@ -1,0 +1,7 @@
+{
+  "syntax_ok": false,
+  "error": "Bad JSON: No JSON array found in text.",
+  "results": [],
+  "_model_halide_code": "import halide as hl\n\n# Define the input and output variables\ninput_image = hl.Var('input_image')\noutput_image = hl.Var('output_image')\n\n# Create a new Halide function that takes the input image as an argument\ndef copy_image(input):\n    # Define the output variable's type and shape\n    output_type = hl.BFloat16(3)\n    output_shape = [hl.int32(100), hl.int32(100)]\n\n    # Use the 'copy' method to create a new output buffer that is a copy of the input image\n    output = hl.Buffer(output_type, output_shape)\n\n    # Copy the input image to the output buffer\n    hl.copy(input, output)\n\n    return output\n\n# Create a Halide pipeline that applies the copy_image function to the input image\npipeline = hl.Pipeline()\ninput_buffer = hl.Buffer(hl.BFloat16(3), [hl.int32(100), hl.int32(100)])\noutput_buffer = copy_image(input_buffer)",
+  "_model_test_cases": "```python\nimport numpy as np\n\n# Create a sample input image\ninput_image = np.random.rand(100, 100, 3).astype(np.float16)\n\n# Run the Halide pipeline with the sample input image\noutput_image = pipeline.run(input_image)\n\n# Save the output image to a file for testing\nimageio.imwrite('output.png', output_image)\n```"
+}

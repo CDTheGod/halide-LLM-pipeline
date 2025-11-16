@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[1.0, 2.0], [3.0, 4.0]]'"
+    },
+    {
+      "idx": 1,
+      "error": "Array load failed: could not convert string to float: '[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image\nimg = hl.ImageParam(hl.float32, [3])\n\n# Compute the gradient in the x direction using the Sobel operator\ngx = hl.Func('gx')\ngx[hx, hy] = (hl.if_(hx == 0, 0,\n                    hl.if_(hx < img.width() - 1, img(hx + 1, hy) - img(hx - 1, hy),\n                           0)) +\n             hl.if_(hy == 0, 0,\n                    hl.if_(hy < img.height() - 1, img(hx, hy + 1) - img(hx, hy - 1),\n                           0)))\n\n# Compute the gradient in the y direction using the Sobel operator\ngy = hl.Func('gy')\ngy[hx, hy] = (hl.if_(hx == 0, 0,\n                    hl.if_(hx < img.width() - 1, img(hx + 1, hy) - img(hx - 1, hy),\n                           0)) +\n             hl.if_(hy == 0, 0,\n                    hl.if_(hy < img.height() - 1, img(hx, hy + 1) - img(hx, hy - 1),\n                           0)))\n\n# Define the output image\noutput = hl.ImageParam(hl.float32, [3])\n\n# Compute the gradient magnitude\ngrad_mag = hl.Func('grad_mag')\ngrad_mag[hx, hy] = hl.sqrt(gx(hx, hy) * gx(hx, hy) + gy(hx, hy) * gy(hx, hy))\n\n# Define the pipeline\npipe = hl.Pipeline(img)\npipe.output(grad_mag)\n\n# Compile and run the pipeline\npipe.compile_to_file('grad_mag')",
+  "_model_test_cases": "```json\n[\n  {\n    \"input\": \"[[1.0, 2.0], [3.0, 4.0]]\",\n    \"expected_output\": \"[[2.8284271247461903, 5.65685424949238], [8.485281237920359, 11.31370849898188]]\"\n  },\n  {\n    \"input\": \"[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]\",\n    \"expected_output\": \"[[2.8284271247461903, 5.65685424949238, 8.485281237920359], [11.31370849898188, 14.142135623730951, 16.97056275046034], [21.21320394731783, 26.45518319477847, 31.6971624412391]]\"\n  }\n]\n```"
+}

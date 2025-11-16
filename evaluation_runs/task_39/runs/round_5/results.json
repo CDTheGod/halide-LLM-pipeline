@@ -1,0 +1,15 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: could not convert string to float: '[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]'"
+    },
+    {
+      "idx": 1,
+      "error": "Array load failed: could not convert string to float: '[[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the size of the kernel (Gaussian blur)\nkernel_size = 5\n\n# Create a Halide pipeline for applying the Gaussian blur filter\ndef gaussian_blur(img):\n    # Define the kernel for the Gaussian blur filter\n    kernel = hl.Func('kernel')\n    kernel[hx, hy] = hl.exp(-(hx * hx + hy * hy) / (2 * kernel_size * kernel_size))\n\n    # Apply the Gaussian blur filter to the image\n    blurred_img = hl.Func('blurred_img')\n    blurred_img[x, y] = hl.ImgDiv(img[x, y], kernel[hx - x, hy - y].Boundary(hl.BoundaryConstant(0)))\n\n    return blurred_img\n\n# Create a Halide pipeline for processing all input images\ndef process_images(images):\n    # Define the output image size\n    output_size = (images[0].shape[1], images[0].shape[0])\n\n    # Apply the Gaussian blur filter to each image in the list\n    blurred_images = []\n    for img in images:\n        blurred_img = gaussian_blur(img)\n        blurred_images.append(blurred_img)\n\n    return blurred_images\n\n# Load the input images from a file (not implemented here)\nimages = [...]  # Replace with actual image loading code\n\n# Process the input images using the Halide pipeline\nblurred_images = process_images(images)\n\n# Save the output images to a file (not implemented here)",
+  "_model_test_cases": "```json\n[\n    {\n        \"input\": \"[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]\",\n        \"expected_output\": \"[[2.0, 2.0, 2.0], [2.0, 2.0, 2.0], [2.0, 2.0, 2.0]]\"\n    },\n    {\n        \"input\": \"[[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]\",\n        \"expected_output\": \"[[[2.0, 2.0], [2.0, 2.0]], [[2.0, 2.0], [2.0, 2.0]]]\"\n    }\n]\n```"
+}

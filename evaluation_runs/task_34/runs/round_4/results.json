@@ -1,0 +1,11 @@
+{
+  "syntax_ok": false,
+  "results": [
+    {
+      "idx": 0,
+      "error": "Array load failed: 'input'"
+    }
+  ],
+  "_model_halide_code": "import halide as hl\n\n# Define the input image as a Halide Image object\ninput_image = hl.Image(hl.float32, [10, 10])\n\n# Define the output image as a Halide Image object\noutput_image = hl.Image(hl.float32, [10, 10])\n\n# Define the pipeline function\ndef pipeline(input):\n    # Create a new Halide Image object with the correct type and dimensions\n    input_image = hl.image_type(2, hl.float32)\n    \n    # Iterate over the pixels in the image using For loops\n    x = hl.For('x', 0, input_image.width(), 1)\n    y = hl.For('y', 0, input_image.height(), 1)\n    \n    # Perform some simple operation on each pixel (e.g., add 1 to the value)\n    output_image(x, y) = input_image(x, y) + 1\n    \n    return output_image\n\n# Compile and run the pipeline\noutput = pipeline(input_image)\n\n# Save the output image as a PNG file\nhl.imageio.imwrite('output.png', output)",
+  "_model_test_cases": "```json\n[\n  {\n    \"test_idx\": 0,\n    \"input_sample\": [[1.0, 2.0], [3.0, 4.0]],\n    \"expected_output_sample\": [[2.0, 3.0], [4.0, 5.0]]\n  }\n]\n```"
+}
